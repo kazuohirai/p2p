@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
+
+    <title>Dashboard Template for Bootstrap</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/jquery-ui.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bignumber.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <script src="js/web3-light.min.js"></script>
+    <script src="js/web3-bolck.js"></script>
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+
+      $(function(){
+        $( "#endtime" ).datepicker({
+          'dateFormat':'yy-mm-dd',
+          'minDate':new Date()
+        });
+        $('#apply').click(function(){
+          newCoin();
+        });
+        var accounts = web3.eth.accounts;
+        if($.isArray(accounts) && accounts.length>0){
+          var shtml = "";
+          for (var i = 0; i < accounts.length; i++) {
+            shtml += "<option>"+accounts[i]+"</option>";
+          }
+          $('#accounts').html(shtml);
+        }else{
+          alert("请确认您的存在账户");
+        }
+      });
+        
+
+    </script>
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">p2p借贷</a>
+        </div>      
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">申请借贷</a></li>
+            <li><a href="/list">借贷交易</a></li>
+          </ul>     
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header" id="tjsq">申请借款</h1>
+
+          <form id="tjf">
+            <div class="form-group">
+              <label>名称</label>
+              <input type="text" class="form-control" id="name" placeholder="名称" style="width:35%" required>
+            </div>
+            <div class="form-group">
+              <label>账号</label>
+              <select class="form-control" id="accounts" style="width:35%"></select>
+            </div>
+            <div class="form-group">
+              <label for="">借款金额</label>
+              <input type="text" class="form-control" id="amount" placeholder="借款金额" style="width:35%">
+            </div> 
+            <div class="form-group">
+              <label for="">计息方式</label>
+              <select class="form-control" id="jxtypr" style="width:35%">
+                <!--<option value="1">按天计息</option>
+                <option value="2">按年计息</option>-->
+                <option value="3">固定利率</option>
+              </select>
+            </div> 
+            <div class="form-group">
+              <label for="">还款时间</label>
+              <input type="text" class="form-control" id="endtime" placeholder="还款时间" style="width:35%">
+            </div> 
+            <div class="form-group">
+              <label>利息</label>
+              <div class="input-group">
+                 <div class="input-group-addon">%</div>
+                <input type="text" class="form-control" id="lx" placeholder="年化利息"  style="width:15%">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="">备注</label>
+              <input type="text" class="form-control" id="mark" placeholder="备注" style="width:35%">
+            </div>
+
+
+            <button type="button" class="btn btn-default" id="apply">提交申请</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <div id="dialog" title="Basic dialog"></div>
+
+    </body>
+</html>
