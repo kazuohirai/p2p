@@ -1,18 +1,15 @@
-## P2P 借贷系统设计
-
-
-#管理员：管理所有的权限
-
-#设置权限
-
-* 1. setBank(address, name) 认证银行
-* 2. setP2P(address, name)  认证P2P借贷公司
+# P2P 借贷系统设计
 
 #角色： 
-
+* 管理员:
 * 银行：
 * P2P借贷公司
 * 个人 或 公司
+
+##管理员
+
+* 1. setBank(address, name) 认证银行
+* 2. setP2P(address, name)  认证P2P借贷公司
 
 #银行的接口
 
