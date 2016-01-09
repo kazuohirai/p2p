@@ -6,17 +6,17 @@
 * P2P借贷公司
 * 个人 或 公司
 
-##管理员
+##管理员的接口
 
 * 1. setBank(address, name) 认证银行
 * 2. setP2P(address, name)  认证P2P借贷公司
 
-#银行的接口
+##银行的接口
 
 sendCNY(address, amount)
 发行人民币，监管资金的用途（一个银行）。
 
-#P2P借贷公司的接口
+##P2P借贷公司的接口
 
 * 1. 负责审核用户资料
 approveAccount(address)  对用户做实名认证
@@ -24,20 +24,19 @@ approveAccount(address)  对用户做实名认证
 * 2. 负责审核借贷是否合法
 approveCoin(id) 对债券做审核
 
-# 借方（有闲钱的人）
+## 借方（有闲钱的人）
 
 * register(name, id, note)  去P2P公司注册资料，实名认证，数据只存hash，用于验证。反正隐私泄漏。
 * check(name, id, note)     检查某个用户资料是否正确
 * getCNY(amount)  把钱存到银行，获取比特人民币的代币. 
 * purchase(bytes32 name, uint value) 认购某个债券
 
-#贷方（要借钱的人）
+## 贷方（要借钱的人）
 
-去P2P公司注册资料，实名认证
-把东西抵押给P2P公司
-发行债券
-借方 认购债券，借方把比特人民币给贷方。
-贷方拿着比特人民币去银行换成资金，用户生产活动。
+* register(name, id, note)  去P2P公司注册资料，实名认证
+* newCoin(...) 发行债券, 可能需要抵押。
+* sendCNY(bankaddress, amount) 贷方拿着比特人民币去银行换成资金，用于生产活动。
+* redeem(name, user) 债券到期，赎回对方的债券。
 
 需要下面的页面：
 
