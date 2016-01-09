@@ -12,17 +12,18 @@
 
     <title>申请贷款</title>
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/jquery-ui.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/bignumber.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/jquery-ui.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.json.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/bignumber.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <script src="/js/ie10-viewport-bug-workaround.js"></script>
     <script src="/js/web3.js"></script>
-    <script src="js/web3-bolck.js"></script>
+    <script src="/js/web3-bolck.js"></script>
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
 
@@ -63,10 +64,12 @@
           }else{
             end_time = Date.parse(end_time)/1000;
             $("#apply").attr("disabled", true);
-            openMacoinDialog('dialog', {'msg':"用时较长,请耐心等待，系统处理中...."});
             var tx = newCoin(name, title, create_note, 0, end_time, amount, ratetpl, rate, defaultAccount);
-            var txt  = "您的TX号为:" + tx + "\r\n系统处理中,切勿关闭窗口,请耐心等待.....";
-            openMacoinDialog('dialog', {'msg':txt});
+            if(tx){
+              var params = {name:name, amount:amount, ratetpl:ratetpl, rate:rate, end_time:end_time, create_note:create_note};
+              setWeb3Data('selldata', params, name, 0);
+              window.location.href = '/mysell';
+            }
           }
         }
       }
