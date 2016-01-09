@@ -1,46 +1,43 @@
-# P2P lending platform On Block chain
+# P2P 借贷系统设计
 
-# Roles： 
-* adminstrator
-* bank
-* P2P lending platform
-* personal or company
-* block chain
+#角色： 
+* 管理员:
+* 银行：
+* P2P借贷公司
+* 个人 或 公司
 
-# APIS
+##管理员的接口
 
-## the adminstrator api
+* 1. approveBank(address, name) 认证银行
+* 2. approveP2P(address, name)  认证P2P借贷公司
 
-#### the system has multi bank and P2P lending platform
-* approveBank(address, name) approve bank with address
-* approveP2P(address, name)  approve P2P lending platform with his address
+##银行的接口
 
-## the bank api
+* sendCNY(address, amount) 给用户发比特人民币(BitCNY or BitUSD)
 
-* sendCNY(address, amount) send BitCNY or BitUSD to user address
+关于 比特人民币的一个注解：
 
-About BitCNY：
+在证券市场市场上，我们都熟悉银证转账，
+银行转入证券的资金，不能用于用户之间的转账，
+只能用于购买证券。我们也限制比特人民币的功能，
+比特人民币只能用在户在P2P市场上购买债券。
 
-like Bank-securities transfer on  trade securities,
-the money can't be transfer from person to person,
-it's can only be used to buy stock.
-the BitCNY on block chain can't be transfer from 
-person to person, it's can only be used to buy BitBond.
+##P2P借贷公司的接口
 
-## the P2P lending platform api
+* approveAccount(address, hash)  对用户做实名认证, hash of (name + id + note)
+* approveCoin(id) 对债券做审核
 
-* approveAccount(address, hash)  validate user info, hash is sha3(name + id + note)
-* approveBond(id) validate the bond
+## 借方（有闲钱的人）
 
-## debit side
 * register(name, id, note)  把资料提交给P2P公司注册资料
 * check(name, id, note)     检查某个用户资料是否正确
-* getCNY(amount)            request for CNY, bank call sendCNY to user. 
-* purchase(name, value)     purchase some 
+* getCNY(amount)            请求进行银证转账，银行会调用sendCNY 发送给用户币. 
+* purchase(bytes32 name, uint value) 认购某个债券
 
-## credit side
+## 贷方（要借钱的人）
+
 * register(name, id, note)     把资料提交给P2P公司 
-* newBond(...)                 发行债券
+* newCoin(...)                 发行债券
 * sendCNY(bankaddress, amount) 贷方拿着比特人民币去银行换成资金，用于生产活动。
 * redeem(name, user)           债券到期，赎回对方的债券。
 
