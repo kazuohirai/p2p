@@ -10,7 +10,7 @@
     <meta name="author" content="">
     <link rel="icon" href="favicon.ico">
 
-    <title>Dashboard Template for Bootstrap</title>
+    <title>借款列表</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/jquery-ui.css" rel="stylesheet">
@@ -21,7 +21,7 @@
     <script src="js/jquery-ui.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="js/ie10-viewport-bug-workaround.js"></script>
-    <script src="js/web3-light.min.js"></script>
+    <script src="/js/web3.js"></script>
     <script src="js/web3-bolck.js"></script>
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
@@ -35,38 +35,53 @@
     <![endif]-->
     <script type="text/javascript">
         $(function(){
-          var total = coindb.getCount();
-          total = parseInt(total) - 1;
-          $('#lists').html("");
-          if(total > 0 ){
-            for (var i = 2; i <= total; i++) {
-              var d = coindb.coins(i);
-              var string = "<tr><td>"+i+"</td><td>"+web3.toAscii(d[2])+"</td><td>0</td><td>"+d[4]+"</td><td>"+d[6]/1000+"%</td><td>"+getLocalTime(d[1])+"</td><td>"+getJxType(d[5])+"</td><td>"+d[3]+"</td><td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#buyModal' data-whatever='"+d[2]+"'>买入</button></td></tr>";
-              $('#lists').append(string);
+            if(checkDefaultAccount() <0){
+              window.location.href = '/home';
             }
-          }else{
-            $('#lists').append("<tr><td colspan=9>暂无相关数据</td></tr>");
-          }
+            $('#opaccount').html(defaultAccount);
+            var total = coindb.getCount();
+            total = parseInt(total);
+            $('#lists').html("");
+            if(total > 0 ){
+                for (var i = total; i >=2; i--) {
+                  var d = coindb.coins(i);
+                  var ename = web3.toAscii(d[3]);
+                  var limit = coindb.coinBalance(ename).toNumber();
+                  var string = "<tr><td>"+i+"</td><td>"+d[4]+"</td><td>"+ename+"</td><td>"+d[2]+"</td><td>"+limit+"</td><td>"+d[6]+"</td><td>"+d[8]/1000+"%</td><td>"+getLocalTime(d[1].toNumber())+"</td><td>"+getJxType(d[7])+"</td><td>"+d[5]+"</td><td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#buyModal' data-whatever='"+d[3]+"'>借款给他</button></td></tr>";
+                  $('#lists').append(string);
+                }
+            }else{
+                $('#lists').append("<tr><td colspan=9>暂无相关数据</td></tr>");
+            }
 
-        $('#buyModal').on('show.bs.modal', function (event) {
-          var button = $(event.relatedTarget) // Button that triggered the modal
-          var recipient = button.data('whatever') // Extract info from data-* attributes
-          var modal = $(this)
-          modal.find('.modal-title').text('买入' + web3.toAscii(recipient) )
-          modal.find('.modal-body input').val(0)
-          $('#sname').val(recipient);
-        })
-        $('#goToBuy').click(function(){
-          var am = $('#recipient-name').val();
-          var tname = $('#sname').val();
-          am = parseFloat(am);
-          if(isNaN(am) || am <=0){
-            alert("输入金额有误");
-          }else{
-            buy(am, tname);
-          }
-          
-        });
+            $('#buyModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var recipient = button.data('whatever');
+                var ename = web3.toAscii(recipient);
+                var modal = $(this);
+                var limit = coindb.coinBalance(ename).toNumber();
+                modal.find('.modal-title').text('借款给' + ename );
+                modal.find('.modal-body input').val(0);
+                $('#sname').val(recipient);
+                $('#max').html(limit);
+                $('#maxLimit').val(limit);
+            })
+            $('#goToBuy').click(function(){
+                var am = $('#recipient-name').val();
+                var tname = $('#sname').val();
+                var max = $('#maxLimit').val();
+                var use = coindb.coinBalanceOf("CNY", defaultAccount).toNumber();
+                am = parseFloat(am);
+                if(isNaN(am) || am <=0){
+                    alert("输入金额有误");
+                }else if(am > max){
+                    alert("您的借款额度大于剩余可借出额度");
+                }else if(use < am){
+                    alert("您的可用资金不足");
+                }else{
+                    buy(am, tname);
+                }
+            });
 
         });
 
@@ -85,7 +100,11 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="#">p2p借贷</a>
-        </div>      
+        </div> 
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="javascript:void(0);">当前账户: <span id="opaccount"></span></a></li>
+            <li><a href="#"><button type="button" class="btn btn-sm btn-info" onclick="window.location.href='/home';">切换操作账户</button></a></li>
+        </ul>  
       </div>
     </nav>
 
@@ -105,7 +124,9 @@
                 <tr>
                   <th>借款编号</th>
                   <th>名称</th>
+                  <th>英文名称</th>
                   <th>借款金额</th>
+                  <th>剩余金额</th>
                   <th>借款人</th>
                   <th>利率</th>
                   <th>还款日期</th>
@@ -132,12 +153,16 @@
               <div class="modal-content">
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <h4 class="modal-title" id="exampleModalLabel">买入</h4>
+                  <h4 class="modal-title" id="exampleModalLabel"></h4>
                 </div>
                 <div class="modal-body">
                   <form>
                     <div class="form-group">
-                      <label for="recipient-name" class="control-label">金额</label>
+                        <label for="recipient-name" class="control-label">最大可借额度</label>
+                        <label for="recipient-name" class="control-label" id="max"></label>
+                    </div>
+                    <div class="form-group">
+                      <label for="recipient-name" class="control-label">借出金额</label>
                       <input type="text" class="form-control" id="recipient-name">
                     </div>
                   </form>
@@ -147,6 +172,7 @@
                   <button type="button" class="btn btn-primary" id="goToBuy">确认</button>
                 </div>
                 <input type="hidden" name="sname" id="sname" value="" />
+                <input type="hidden" name="maxLimit" id="maxLimit" value="0" />
               </div>
             </div>
           </div>
