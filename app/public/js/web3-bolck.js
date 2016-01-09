@@ -51,7 +51,7 @@ function newCoin(name, title, create_note, s_time, end_time, amount, ratetpl, ra
 
 function buy(am, name){
 	var tid = coindb.purchase(name, am);
-	console.log(tid);
+	return tid;
 }
 
 function openMacoinDialog(id, params)
@@ -126,5 +126,18 @@ function getWeb3Data(name, key){
         }
     }catch(e){}
     return result;
+}
+
+function delWeb3Data(name, key){
+    try{
+        var data =  web3.db.getString("p2pdb", name);
+        data = jQuery.parseJSON(data);
+        if(key != "" && typeof(data[key]) == 'object'){
+            delete data[key];
+            var str = $.toJSON(data);
+            web3.db.putString("p2pdb", name, str);
+        }
+    }catch(e){}
+    return true;
 }
 

@@ -12,17 +12,18 @@
 
     <title>借款列表</title>
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/jquery-ui.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/bignumber.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/jquery-ui.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.json.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/bignumber.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <script src="/js/ie10-viewport-bug-workaround.js"></script>
     <script src="/js/web3.js"></script>
-    <script src="js/web3-bolck.js"></script>
+    <script src="/js/web3-bolck.js"></script>
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -46,30 +47,37 @@
                 for (var i = total; i >=2; i--) {
                   var d = coindb.coins(i);
                   var ename = web3.toAscii(d[3]);
-                  var limit = coindb.coinBalance(ename).toNumber();
-                  var string = "<tr><td>"+i+"</td><td>"+d[4]+"</td><td>"+ename+"</td><td>"+d[2]+"</td><td>"+limit+"</td><td>"+d[6]+"</td><td>"+d[8]/1000+"%</td><td>"+getLocalTime(d[1].toNumber())+"</td><td>"+getJxType(d[7])+"</td><td>"+d[5]+"</td><td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#buyModal' data-whatever='"+d[3]+"'>借款给他</button></td></tr>";
-                  $('#lists').append(string);
+                  var limit = coindb.coinBalanceOf(ename, d[6]).toNumber();
+                  if(d[6].trim() != defaultAccount){
+                    var string = "<tr><td>"+i+"</td><td>"+d[4]+"</td><td>"+ename+"</td><td>"+d[2]+"</td><td>"+limit+"</td><td>"+d[6]+"</td><td>"+d[8]/1000+"%</td><td>"+getLocalTime(d[1].toNumber())+"</td><td>"+getJxType(d[7])+"</td><td>"+d[5]+"</td><td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#buyModal' data-whatever='"+d[3]+"' data-id='"+i+"'>借款给他</button></td></tr>";
+                    $('#lists').append(string);
+                  }
+  
                 }
             }else{
                 $('#lists').append("<tr><td colspan=9>暂无相关数据</td></tr>");
             }
-
+coindb.coinBalance(ename, d[6]).toNumber();
             $('#buyModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
                 var recipient = button.data('whatever');
+                var sid = button.data('id');
                 var ename = web3.toAscii(recipient);
                 var modal = $(this);
-                var limit = coindb.coinBalance(ename).toNumber();
+                var d = coindb.coins(sid);
+                var limit = coindb.coinBalanceOf(ename, d[6]).toNumber();
                 modal.find('.modal-title').text('借款给' + ename );
                 modal.find('.modal-body input').val(0);
                 $('#sname').val(recipient);
                 $('#max').html(limit);
                 $('#maxLimit').val(limit);
+                $('#sid').val(sid);
             })
             $('#goToBuy').click(function(){
                 var am = $('#recipient-name').val();
                 var tname = $('#sname').val();
                 var max = $('#maxLimit').val();
+                var sid = $('#sid').val();
                 var use = coindb.coinBalanceOf("CNY", defaultAccount).toNumber();
                 am = parseFloat(am);
                 if(isNaN(am) || am <=0){
@@ -79,7 +87,10 @@
                 }else if(use < am){
                     alert("您的可用资金不足");
                 }else{
-                    buy(am, tname);
+                    var tid = buy(am, tname);
+                    var params = {id:sid,amount:am,tid:tid};
+                    setWeb3Data('buydata', params, tname, 1);
+                    window.location.href = '/mybuy';
                 }
             });
 
@@ -173,6 +184,7 @@
                 </div>
                 <input type="hidden" name="sname" id="sname" value="" />
                 <input type="hidden" name="maxLimit" id="maxLimit" value="0" />
+                <input type="hidden" name="sid" id="sid" value="0" />
               </div>
             </div>
           </div>
