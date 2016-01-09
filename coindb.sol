@@ -1,9 +1,9 @@
 contract CoinDb {
     mapping (uint => Coin) public coins;
     mapping (bytes32 => uint) public ids;
-    mapping (address => bytes32) accountHash;
-    mapping (address => bytes32) p2pList;
-    mapping (address => bytes32) bankList;
+    mapping (address => string) public accountHash;
+    mapping (address => bool) public p2pList;
+    mapping (address => bool) public bankList;
     address public owner;
     uint m_count;
 
@@ -84,23 +84,21 @@ contract CoinDb {
 	    return m_count; 
 	}
 
-	function getAccountHash(address addr) returns(bytes32 hash) {   
+	function getAccountHash(address addr) constant returns(string hash) {   
 	    hash = accountHash[addr];
 	}
 	
-	function isP2P(address addr) returns (bool _success) {
-		bytes32 zero;
-	    _success = p2pList[addr] != zero;
+	function isP2P(address addr) constant returns (bool _success) {
+	    return p2pList[addr];
 	}
 	
-	function isBank(address addr) returns (bool _success) {
-		bytes32 zero;
-	    _success = bankList[addr] != zero;
+	function isBank(address addr) constant returns (bool _success) {
+	    return bankList[addr];
 	}
 	
-	function approveP2P(address addr, bytes32 hash) returns (bool _success) {
+	function approveP2P(address addr) returns (bool _success) {
 	    if (msg.sender == owner) {
-	        p2pList[addr] = hash;
+	        p2pList[addr] = true;
 	        return true;
 	    }
 	    return false;
@@ -108,14 +106,14 @@ contract CoinDb {
 	
     function approveBank(address addr, bytes32 hash) returns (bool _success) {
 	    if (msg.sender == owner) {
-	        bankList[addr] = hash;
+	        bankList[addr] = true;
 	        return true;
 	    }
 	    return false;
     }	
 	
-	function approveAccount(address addr, bytes32 _hash) returns(bool _success) {
-	    if (isP2P(addr)) {
+	function approveAccount(address addr, string _hash) returns(bool _success) {
+	    if (isP2P(msg.sender)) {
 	        accountHash[addr] = _hash;
 	        return true;
 	    }
@@ -385,3 +383,4 @@ contract CoinDb {
         _success = true;
     }
 }
+
