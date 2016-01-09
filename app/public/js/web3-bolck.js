@@ -93,15 +93,38 @@ function getJxType(t){
 	return type[t];
 }
 
-function setWeb3Data(name, params){
-
+function setWeb3Data(name,  params, key, isrepeace){
+    var isr = (typeof(isrepeace) != 'undefined') ? isrepeace : 0;
+    var data = {};
+    try{
+        var data =  web3.db.getString("p2pdb", name);
+        data = jQuery.parseJSON(data);
+        if(typeof(data[key]) == 'object' && data[key]){
+            if(isr == 1){
+                data[key] = params;
+            }
+        }else{
+            data[key] = params;
+        }
+    }catch(e){
+        data[key] = params;
+    }
+    var str = $.toJSON(data);
+    return web3.db.putString("p2pdb", name, str);
 }
 
-function getWeb3Data(name){
+function getWeb3Data(name, key){
+    var mykey = (typeof(key) != 'undefined') ? key : '';
     var result = {};
     try{
         var data =  web3.db.getString("p2pdb", name);
+        data = jQuery.parseJSON(data);
+        if(mykey != "" && typeof(data[mykey]) == 'object'){
+            result = data[key];
+        }else{
+          result = data;
+        }
     }catch(e){}
-
+    return result;
 }
 
