@@ -21,6 +21,7 @@
     <script src="js/jquery-ui.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <script src="js/jquery.json.min.js"></script>
     <script src="js/web3.js"></script>
     <script src="js/web3-bolck.js"></script>
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
@@ -35,13 +36,13 @@
     <script type="text/javascript">
 
       $(function(){
-        $(document).ready(function(){           
-            //$('#account').val(web3.eth.accounts[0]);
-            if(checkDefaultAccount() <0){
-              window.location.href = '/home';
-            }
-            $('#opaccount').html(defaultAccount);
-        });
+       
+        //$('#account').val(web3.eth.accounts[0]);
+        if(checkDefaultAccount() <0){
+          window.location.href = '/home';
+        }
+        $('#opaccount').html(defaultAccount);
+       
 
         $('#register').click(function(){
           register();
@@ -57,12 +58,12 @@
         });
 
         var register = function() {
-            var account = $("#account").val();
+            var account = defaultAccount;//$("#account").val();
             var name = $("#name").val();
             var IDcard = $("#IDcard").val();
             var note   = $("#note").val();
-            var hash = web3.sha3(account + name + IDcard + note);
-            console.log(hash);
+            //var hash = web3.sha3(account + name + IDcard + note);
+            //console.log(hash);
             //var reg = coindb.approveAccount(account, hash);
             //console.log(reg);
 
@@ -75,8 +76,21 @@
             }else if(IDcard == ""){
                 alert("身份证号码不能为空");
             }else{
-               var reg = coindb.approveAccount.sendTransaction(account, hash, {from:web3.eth.accounts[0], gas:1000000});
-               console.log(reg);
+
+               //var reg = coindb.approveAccount.sendTransaction(account, hash, {from:web3.eth.accounts[0], gas:1000000});
+               //console.log(reg);
+
+               var userinfo = {
+                    account : account,
+                    name : name,
+                    IDcard : IDcard,
+                    note : note
+               }
+
+               if( setWeb3Data('verifyuserinfo',  userinfo, 'verifyuserinfo', 1) ){
+                    alert("等待审核");
+               }
+
             }
         }
 
@@ -119,6 +133,11 @@
             <li><a href="/bankapply">银行汇款</a></li>
             <li><a href="/bankorder">银行处理</a></li>
           </ul>
+          <h4>p2p公司</h4>
+          <ul class="nav nav-sidebar">
+            <li><a href="/verifyuserinfo">审核用户资料</a></li>
+            <li><a href="/verifylist">审核债券发行</a></li>
+          </ul>
           <h4>债券</h4>
           <ul class="nav nav-sidebar">
             <li><a href="/apply">申请借贷</a></li>
@@ -126,9 +145,8 @@
           </ul> 
           <h4>交易</h4>
           <ul class="nav nav-sidebar">
-            <li><a href="/apply">卖出债券</a></li>
-            <li><a href="/list">可购买列表</a></li>
-            <li><a href="/list">买入债券</a></li>
+            <li><a href="/tradesell">卖出债券</a></li>           
+            <li><a href="/tradebuy">买入债券</a></li>
           </ul>       
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">

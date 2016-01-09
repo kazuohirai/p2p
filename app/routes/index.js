@@ -50,6 +50,42 @@ module.exports = function(app){
 		res.render('details', {trade_id: trade_id});  
 	});
 
+	app.all('/myaccount', function(req, res) {
+		res.render('mybuy');
+	});
+
+	app.all('/register', function(req, res) {
+		res.render('register');
+	});
+
+	app.all('/check', function(req, res) {
+		res.render('check');
+	});
+
+	app.get('/verifyuserinfo', function(req, res) {
+		res.render('verifyuserinfo');  
+	});
+
+	app.get('/verifylist', function(req, res) {
+		res.render('verifylist');  
+	});
+
+	app.get('/tradebuy', function(req, res) {
+		res.render('tradebuy');  
+	});
+
+	app.get('/tradesell', function(req, res) {
+		res.render('tradesell');  
+	});
+
+	
+	app.get('/mybuy', function(req, res) {
+		res.render('mybuy');  
+	});
+
+	app.get('/mysell', function(req, res) {
+		res.render('mysell');  
+	});	
 };
 
 
