@@ -1,9 +1,9 @@
-//var block = require("./block");
+//var bank = require("./bank");
 
 
 module.exports = function(app){
 	
-	//block(app);
+	//bank(app);
 
 	app.get('/', function(req, res) {
 		res.render('index',{web3: app.get('web3')});  
@@ -37,8 +37,12 @@ module.exports = function(app){
 		res.render('home');  
 	});
 
-	app.get('/login', function(req, res) {
-		res.render('login');  
+	app.get('/bankapply', function(req, res) {
+		res.render('bankapply');  
+	});
+
+	app.get('/bankorder', function(req, res) {
+		res.render('bankorder');  
 	});
 
 	app.all('/detail/:id', function(req, res) {
