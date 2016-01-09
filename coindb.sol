@@ -1,13 +1,22 @@
 contract CoinDb {
     mapping (uint => Coin) public coins;
     mapping (bytes32 => uint) public ids;
+    mapping (address => bytes32) accountHash;
+    mapping (address => bytes32) p2pList;
+    mapping (address => bytes32) bankList;
     address public owner;
     uint m_count;
 
+    mapping ( uint => Order ) public orders;
+    uint nextOrderId = 1;
+
+    event Traded(bytes32 indexed currencyPair, address indexed seller, uint256 offerValue, address indexed buyer, uint256 wantValue);
 	event Sent(address indexed from, address indexed to, bytes32 name, uint amount);
     event Create(address indexed from, bytes32 name, uint id);
     event Purchase(address indexed from, address indexed to, bytes32 name, uint amount);
     event Redeem(address indexed from, address indexed to, bytes32 name);
+    event GetCNY(address indexed from, address indexed to, uint amount);
+ 
     struct Coin 
     {
 	    mapping (address => uint) balances;
@@ -42,9 +51,15 @@ contract CoinDb {
         return msg.sender;
     }
 
-    //status 0 ＝> init , 1 => create, 2 => complete , 3 => finish
+    //status 0 ＝> not init 
+    //       1 => create
+    //       2 => complete
+    //       3 => finish
 	function newCoin(bytes32 name, string title, string note, uint starttime, uint endtime, uint value, uint ratetpl, uint ratevalue) {
-	    if (ids[name] == 0) {
+		if (endtime == 0) {
+			endtime = block.timestamp;
+		}
+	    if (ids[name] == 0 && endtime >= block.timestamp) {
 	        ids[name] = m_count+1;
 	        m_count++;
 	    } else {
@@ -52,7 +67,7 @@ contract CoinDb {
 	    }
 	    uint id = ids[name];
 	    coins[id].balances[msg.sender] = value;
-	    coins[id].starttime = starttime;
+	    coins[id].starttime = block.timestamp;
 	    coins[id].endtime = endtime;
         coins[id].value = value;
 	    coins[id].name = name;
@@ -68,9 +83,43 @@ contract CoinDb {
 	function getCount() constant returns(uint _r) {
 	    return m_count; 
 	}
+
+	function getAccountHash(address addr) returns(bytes32 hash) {   
+	    hash = accountHash[addr];
+	}
 	
-	function setCount() {
-	    m_count++;
+	function isP2P(address addr) returns (bool _success) {
+		bytes32 zero;
+	    _success = p2pList[addr] != zero;
+	}
+	
+	function isBank(address addr) returns (bool _success) {
+		bytes32 zero;
+	    _success = bankList[addr] != zero;
+	}
+	
+	function approveP2P(address addr, bytes32 hash) returns (bool _success) {
+	    if (msg.sender == owner) {
+	        p2pList[addr] = hash;
+	        return true;
+	    }
+	    return false;
+	}
+	
+    function approveBank(address addr, bytes32 hash) returns (bool _success) {
+	    if (msg.sender == owner) {
+	        bankList[addr] = hash;
+	        return true;
+	    }
+	    return false;
+    }	
+	
+	function approveAccount(address addr, bytes32 _hash) returns(bool _success) {
+	    if (isP2P(addr)) {
+	        accountHash[addr] = _hash;
+	        return true;
+	    }
+	    return false;
 	}
 	
 	function purchase(bytes32 name, uint value) returns (bool _success)  {
@@ -135,8 +184,9 @@ contract CoinDb {
 	    Coin coin = coins[id];
 	    return coin.approved[msg.sender][_proxy];
 	}
-
-	function sendCoinFrom(bytes32  name, address _from,uint256 _val,address _to) returns (bool _success)  {
+    
+    //it's private 
+	function sendCoinFrom(bytes32  name, address _from,uint256 _val,address _to) private returns (bool _success)  {
 	    _success = false;
         //has init and not finish
 	    if (!canTrade(name)) {
@@ -151,6 +201,39 @@ contract CoinDb {
 			_success = true;
 		}
 	}
+	
+	//it's private
+	function sendCoin(bytes32  name, uint256 _val,address _to) private returns (bool _success) {
+        //has init and not finish
+        _success = false;
+	    if (!canTrade(name)) {
+	        throw;
+	    }
+	    uint id = ids[name];
+	    Coin coin = coins[id];
+		if (coin.balances[msg.sender] >= _val) {
+			coin.balances[msg.sender] -= _val;
+			coin.balances[_to] += _val;
+			Sent(msg.sender, _to, name, _val);
+			_success = true;
+		}
+	}
+
+	//only from or to has one bank address, can be send.
+	function sendCNY(address to, uint val) returns (bool _success) {
+		if (!isBank(msg.sender) && !isBank(to)) {
+			throw;
+		}
+		return sendCoin("CNY", val, to);
+	}
+
+	//notify banck to send cny to me
+	function getCNY(address to, uint val) {
+		if (!isBank(to)) {
+			throw;
+		}
+		GetCNY(msg.sender, to, val);
+	}
 
 	function coinBalanceOf(bytes32  name, address _a) constant returns(uint256 _r){
 	    if (!isInit(name)) {
@@ -160,7 +243,7 @@ contract CoinDb {
 	    Coin coin = coins[id];
 	    return coin.balances[_a];
 	}
-	
+
 	function status(bytes32 name) constant returns(uint8 _r) {
 	    uint id = ids[name];
 	    Coin coin = coins[id];
@@ -186,22 +269,6 @@ contract CoinDb {
 	    return false;
 	}
 
-	function sendCoin(bytes32  name, uint256 _val,address _to) returns (bool _success) {
-        //has init and not finish
-        _success = false;
-	    if (!canTrade(name)) {
-	        throw;
-	    }
-	    uint id = ids[name];
-	    Coin coin = coins[id];
-		if (coin.balances[msg.sender] >= _val) {
-			coin.balances[msg.sender] -= _val;
-			coin.balances[_to] += _val;
-			Sent(msg.sender, _to, name, _val);
-			_success = true;
-		}
-	}
-
 	function coinBalance(bytes32  name) constant returns(uint256 _r){
 	    if (!isInit(name)) {
 	        throw;
@@ -221,7 +288,7 @@ contract CoinDb {
 	    coin.approved[msg.sender][_a] = true;
 	}
 
-	function coinValueOf(bytes32  name, address _a)constant returns(uint256 _r){
+	function coinValueOf(bytes32  name, address _a)constant returns(uint256 _r) {
 	    if (!isInit(name)) {
 	        throw;
 	    }
@@ -259,10 +326,7 @@ contract CoinDb {
 	    totalvalue = basevalue ;
     }
 	
-	event Traded(bytes32 indexed currencyPair, address indexed seller, uint256 offerValue, address indexed buyer, uint256 wantValue);
-
-    mapping ( uint => Order ) public orders;
-    uint nextOrderId = 1;
+	
 
     function placeOrder(bytes32 _offerCurrency, uint _offerValue, bytes32 _wantCurrency, uint _wantValue) returns (uint256 _offerId) {
         if (!canTrade(_offerCurrency) || !canTrade(_wantCurrency) ) {
