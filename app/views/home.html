@@ -11,17 +11,18 @@
     <link rel="icon" href="favicon.ico">
 
     <title>账户选择</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/jquery-ui.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/bignumber.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/jquery-ui.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script> 
+
+    <script src="/js/bignumber.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="js/ie10-viewport-bug-workaround.js"></script>
-    <script src="js/web3-light.min.js"></script>
-    <script src="js/web3-bolck.js"></script>
+   <script src="/js/web3.js"></script>
+    <script src="/js/web3-bolck.js"></script>
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
 
@@ -33,7 +34,6 @@
     <![endif]-->
 
     <script type="text/javascript">
-
       function changeDefault(){
         var daccount = $('#select').val();
         if(daccount == -1){
@@ -44,7 +44,7 @@
             alert("操作成功");
             window.location.href = '/apply';
           }else{
-            alert("账户选择失败");
+            alert("账户选择失败,请检查账户是否足额");
           }
         }
       }

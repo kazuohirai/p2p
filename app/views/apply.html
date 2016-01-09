@@ -10,7 +10,7 @@
     <meta name="author" content="">
     <link rel="icon" href="favicon.ico">
 
-    <title>Dashboard Template for Bootstrap</title>
+    <title>申请贷款</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/jquery-ui.css" rel="stylesheet">
@@ -21,7 +21,7 @@
     <script src="js/jquery-ui.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="js/ie10-viewport-bug-workaround.js"></script>
-    <script src="js/web3-light.min.js"></script>
+    <script src="/js/web3.js"></script>
     <script src="js/web3-bolck.js"></script>
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -34,24 +34,55 @@
     <![endif]-->
     <script type="text/javascript">
 
+      function sendNewCoin(){
+        var title = $('#title').val();
+        var name = $('#name').val();
+        var create_note = $('#mark').val();
+        var end_time = $('#endtime').val();
+        var amount = $('#amount').val();
+        var ratetpl = $('#jxtypr').val();
+        var rate =$('#lx').val();
+        amount = parseFloat(amount);
+        rate = parseFloat(rate) * 1000;
+        var a = /^(\d{4})-(\d{2})-(\d{2})$/;
+        var checkname = /^[A-Za-z]+$/;
+        if(!name || name == "" || !checkname.test(name)){
+          alert("英文名称不符合规范");
+        }else if(!title || title == ""){
+          alert("名称不能为空");
+        }else if(isNaN(rate) || rate <=0){
+          alert("利息不正确");
+        }else if(isNaN(amount) || amount <=0){
+          alert("金额不正确");
+        }else if(!a.test(end_time)){
+          alert("还款日期格式不正确");
+        }else{
+          var id = coindb.ids(name);
+          if(id.greaterThan(0)){
+            alert("英文名称已经存在,请更换一个");
+          }else{
+            end_time = Date.parse(end_time)/1000;
+            $("#apply").attr("disabled", true);
+            openMacoinDialog('dialog', {'msg':"用时较长,请耐心等待，系统处理中...."});
+            var tx = newCoin(name, title, create_note, 0, end_time, amount, ratetpl, rate, defaultAccount);
+            var txt  = "您的TX号为:" + tx + "\r\n系统处理中,切勿关闭窗口,请耐心等待.....";
+            openMacoinDialog('dialog', {'msg':txt});
+          }
+        }
+      }
+
       $(function(){
+        if(checkDefaultAccount() <0){
+          window.location.href = '/home';
+        }
+        $('#opaccount').html(defaultAccount);
         $( "#endtime" ).datepicker({
           'dateFormat':'yy-mm-dd',
           'minDate':new Date()
         });
         $('#apply').click(function(){
-          newCoin();
+          sendNewCoin();
         });
-        var accounts = web3.eth.accounts;
-        if($.isArray(accounts) && accounts.length>0){
-          var shtml = "";
-          for (var i = 0; i < accounts.length; i++) {
-            shtml += "<option>"+accounts[i]+"</option>";
-          }
-          $('#accounts').html(shtml);
-        }else{
-          alert("请确认您的存在账户");
-        }
       });
         
 
@@ -70,7 +101,11 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="#">p2p借贷</a>
-        </div>      
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="javascript:void(0);">当前账户: <span id="opaccount"></span></a></li>
+            <li><a href="#"><button type="button" class="btn btn-sm btn-info" onclick="window.location.href='/home';">切换操作账户</button></a></li>
+        </ul>
       </div>
     </nav>
 
@@ -88,11 +123,11 @@
           <form id="tjf">
             <div class="form-group">
               <label>名称</label>
-              <input type="text" class="form-control" id="name" placeholder="名称" style="width:35%" required>
+              <input type="text" class="form-control" id="title" placeholder="名称" style="width:35%" required>
             </div>
             <div class="form-group">
-              <label>账号</label>
-              <select class="form-control" id="accounts" style="width:35%"></select>
+              <label>英文名称</label>
+              <input type="text" class="form-control" id="name" placeholder="英文名称" style="width:35%" required>
             </div>
             <div class="form-group">
               <label for="">借款金额</label>
@@ -101,9 +136,9 @@
             <div class="form-group">
               <label for="">计息方式</label>
               <select class="form-control" id="jxtypr" style="width:35%">
-                <!--<option value="1">按天计息</option>
-                <option value="2">按年计息</option>-->
-                <option value="3">固定利率</option>
+                <option value="1">按天计息</option>
+                <!--<option value="2">按年计息</option>
+                <option value="3">固定利率</option>-->
               </select>
             </div> 
             <div class="form-group">

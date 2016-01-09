@@ -1,9 +1,9 @@
-var block = require("./block");
+//var block = require("./block");
 
 
 module.exports = function(app){
 	
-	block(app);
+	//block(app);
 
 	app.get('/', function(req, res) {
 		res.render('index',{web3: app.get('web3')});  
@@ -19,6 +19,10 @@ module.exports = function(app){
 
 	app.all('/coin', function(req, res) {
 		res.render('coin');  
+	});
+
+	app.all('/coin2', function(req, res) {
+		res.render('coin2');  
 	});
 
 	app.all('/apply', function(req, res) {
