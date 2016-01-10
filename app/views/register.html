@@ -42,8 +42,8 @@
           window.location.href = '/home';
         }
         $('#opaccount').html(defaultAccount);
+        $("#account").val(defaultAccount);
        
-
         $('#register').click(function(){
           register();
         });
@@ -58,7 +58,7 @@
         });
 
         var register = function() {
-            var account = defaultAccount;//$("#account").val();
+            var account = $("#account").val();
             var name = $("#name").val();
             var IDcard = $("#IDcard").val();
             var note   = $("#note").val();

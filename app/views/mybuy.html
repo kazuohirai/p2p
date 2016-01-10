@@ -36,14 +36,17 @@
             window.location.href = '/home';
           }
 
-          var total = coindb.getCount();
-          total = parseInt(total) -1;
+          var total = coindb.getCount();console.log("total:" + total);
+          total = parseInt(total);
           
           if(total > 0 ){
             var mydata = getWeb3Data("buydata");
             for (var i = 2; i <= total; i++) {
               var d = coindb.coins(i);
+              console.log("i:" + i);
+              console.log(d[3]);
               if(mydata && typeof(mydata[d[3]]) == 'object'){
+                console.log("d3:" + d[3]);
                 delete mydata[d[3]];
                 delWeb3Data("buydata", d[3]);
               }

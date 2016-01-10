@@ -53,8 +53,9 @@
         //console.log(userinfo);
         if(userinfo.account == undefined){
           //window.location.href = '/register';
-          openMacoinDialog('dialog', {'msg':'暂无审核信息，请先在线开户！'});
-          setTimeout("window.location.href = '/register'", 3000);
+          //openMacoinDialog('dialog', {'msg':'暂无审核信息，请先在线开户！'});
+          //setTimeout("window.location.href = '/register'", 3000);
+          alert("暂无审核信息");
           
         } else{
           $("#account").val(userinfo.account);
