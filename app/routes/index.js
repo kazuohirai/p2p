@@ -6,7 +6,7 @@ module.exports = function(app){
 	//bank(app);
 
 	app.get('/', function(req, res) {
-		res.render('index',{web3: app.get('web3')});  
+		res.render('register');
 	});
 
 	app.all('/getBalance/:coin', function(req, res) {
