@@ -33,24 +33,24 @@ person to person, it's can only be used to buy BitBond.
 * approveBond(id) validate the bond
 
 ## debit side
-* register(name, id, note)  把资料提交给P2P公司注册资料
-* check(name, id, note)     检查某个用户资料是否正确
+* register(name, id, note)  register in p2p lending platform 
+* check(name, id, note)     check the user info is ok
 * getCNY(amount)            request for CNY, bank call sendCNY to user. 
 * purchase(name, value)     purchase some 
 
 ## credit side
-* register(name, id, note)     把资料提交给P2P公司 
-* newBond(...)                 发行债券
-* sendCNY(bankaddress, amount) 贷方拿着比特人民币去银行换成资金，用于生产活动。
-* redeem(name, user)           债券到期，赎回对方的债券。
+* register(name, id, note)     register in p2p lending platform  
+* newBond(...)                 publish bond
+* sendCNY(bankaddress, amount) send BitCNY to bank
+* redeem(name, user)           redeem the bond
 
 
-## 交易债券之间的转让
+## trades api
 
-* placeOrder(offerCurrency, offerValue, wantCurrency, wantValue) 放入订单
-* matchOrder(orderId)  配对
-* cancelOrder(orderId) 撤单
-* orders()             订单列表
+* placeOrder(offerCurrency, offerValue, wantCurrency, wantValue) place order
+* matchOrder(orderId)  match order
+* cancelOrder(orderId) cancel order
+* orders()             order list
 
 ##All  Pages：
 
