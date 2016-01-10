@@ -67,6 +67,17 @@
           $('#verifyuserinfo').click(function(){
              var hash = web3.sha3(userinfo.account + userinfo.name + userinfo.IDcard + userinfo.note);
              var reg = coindb.approveAccount.sendTransaction(userinfo.account, hash, {from:defaultAccount, gas:1000000});
+             
+             if(reg) {
+                /*var hash_in_block = coindb.getAccountHash(userinfo.account);
+                if(hash_in_block != ""){
+                  alert("审核通过");
+                } else {
+                  alert("审核未通过");
+                }*/
+                alert("审核通过,正在写入区块链中...");
+
+             }
              console.log(reg);
           });
         }
