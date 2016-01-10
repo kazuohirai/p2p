@@ -59,7 +59,7 @@
                   delete mydata.tmpname;
                   delWeb3Data("selldata", tmpname);
                 }
-                var balance = coindb.coinBalanceOf("CNY", d[6]).toNumber();
+                var balance = coindb.coinBalanceOf(tmpname, d[6]).toNumber();
                 var sell_string = "<tr><td>"+i+"</td><td>"+ename+"</td><td>"+d[2]+"</td><td>"+balance+"</td><td>"+d[8]/1000+"%</td><td>"+getLocalTime(d[1])+"</td><td>"+getJxType(d[7])+"</td><td>"+d[5]+"</td><td>ok</td></tr>";  
                  $('#selllists').append(sell_string);
               }
